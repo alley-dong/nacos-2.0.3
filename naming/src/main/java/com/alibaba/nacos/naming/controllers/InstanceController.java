@@ -104,7 +104,8 @@ public class InstanceController {
     @PostMapping
     @Secured(parser = NamingResourceParser.class, action = ActionTypes.WRITE)
     public String register(HttpServletRequest request) throws Exception {
-        
+
+        // 接收信息 并还原成 instance
         final String namespaceId = WebUtils
                 .optional(request, CommonParams.NAMESPACE_ID, Constants.DEFAULT_NAMESPACE_ID);
         final String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);
@@ -112,7 +113,8 @@ public class InstanceController {
         
         final Instance instance = HttpRequestInstanceBuilder.newBuilder()
                 .setDefaultInstanceEphemeral(switchDomain.isDefaultInstanceEphemeral()).setRequest(request).build();
-        
+
+        // 使用Grpc协议
         getInstanceOperator().registerInstance(namespaceId, serviceName, instance);
         return "ok";
     }
@@ -441,6 +443,7 @@ public class InstanceController {
     }
     
     private InstanceOperator getInstanceOperator() {
+        // 使用 instanceServiceV2
         return upgradeJudgement.isUseGrpcFeatures() ? instanceServiceV2 : instanceServiceV1;
     }
 }

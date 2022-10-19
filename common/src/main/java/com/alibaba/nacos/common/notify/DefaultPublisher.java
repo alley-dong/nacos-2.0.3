@@ -141,6 +141,7 @@ public class DefaultPublisher extends Thread implements EventPublisher {
     public boolean publish(Event event) {
         checkIsStart();
         boolean success = this.queue.offer(event);
+        // 判断加入队列是否成功
         if (!success) {
             LOGGER.warn("Unable to plug in due to interruption, synchronize sending time, event : {}", event);
             receiveEvent(event);

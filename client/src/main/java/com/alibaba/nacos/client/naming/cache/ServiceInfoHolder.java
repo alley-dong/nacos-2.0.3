@@ -152,17 +152,21 @@ public class ServiceInfoHolder implements Closeable {
             return null;
         }
         ServiceInfo oldService = serviceInfoMap.get(serviceInfo.getKey());
+        // 判断数据格式是否正确
         if (isEmptyOrErrorPush(serviceInfo)) {
             //empty or error push, just ignore
             return oldService;
         }
+        //  缓存数据
         serviceInfoMap.put(serviceInfo.getKey(), serviceInfo);
+        // 判断是否更改
         boolean changed = isChangedServiceInfo(oldService, serviceInfo);
         if (StringUtils.isBlank(serviceInfo.getJsonFromServer())) {
             serviceInfo.setJsonFromServer(JacksonUtils.toJson(serviceInfo));
         }
         MetricsMonitor.getServiceInfoMapSizeMonitor().set(serviceInfoMap.size());
         if (changed) {
+            // 添加更改事件
             NAMING_LOGGER.info("current ips:(" + serviceInfo.ipCount() + ") service: " + serviceInfo.getKey() + " -> "
                     + JacksonUtils.toJson(serviceInfo.getHosts()));
             NotifyCenter.publishEvent(new InstancesChangeEvent(serviceInfo.getName(), serviceInfo.getGroupName(),
