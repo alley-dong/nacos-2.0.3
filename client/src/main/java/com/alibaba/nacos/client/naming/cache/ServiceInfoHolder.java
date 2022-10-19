@@ -59,15 +59,19 @@ public class ServiceInfoHolder implements Closeable {
     private static final String USER_HOME_PROPERTY = "user.home";
     
     private final ConcurrentMap<String, ServiceInfo> serviceInfoMap;
-    
+
+    // 故障转移反应者
     private final FailoverReactor failoverReactor;
     
     private final boolean pushEmptyProtection;
-    
+
+    // 用于指定本地缓存的根目录和故障转移的根目录
     private String cacheDir;
     
     public ServiceInfoHolder(String namespace, Properties properties) {
+        // 初始化目录路径
         initCacheDir(namespace, properties);
+        // 是否读取缓存目录读取信息  默认false
         if (isLoadCacheAtStart(properties)) {
             this.serviceInfoMap = new ConcurrentHashMap<String, ServiceInfo>(DiskCache.read(this.cacheDir));
         } else {

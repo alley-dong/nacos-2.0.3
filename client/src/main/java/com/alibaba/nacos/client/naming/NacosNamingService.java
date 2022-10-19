@@ -395,7 +395,9 @@ public class NacosNamingService implements NamingService {
             return;
         }
         String clusterString = StringUtils.join(clusters, ",");
+        // 注册监听   事件注册
         changeNotifier.registerListener(groupName, serviceName, clusterString, listener);
+        // 订阅
         clientProxy.subscribe(serviceName, groupName, clusterString);
     }
     

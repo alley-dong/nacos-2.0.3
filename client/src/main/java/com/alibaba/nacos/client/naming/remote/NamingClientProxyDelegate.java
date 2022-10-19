@@ -141,6 +141,7 @@ public class NamingClientProxyDelegate implements NamingClientProxy {
     public ServiceInfo subscribe(String serviceName, String groupName, String clusters) throws NacosException {
         String serviceNameWithGroup = NamingUtils.getGroupedName(serviceName, groupName);
         String serviceKey = ServiceInfo.getKey(serviceNameWithGroup, clusters);
+        // 创建定时任务 每6秒执行一次
         serviceInfoUpdateService.scheduleUpdateIfAbsent(serviceName, groupName, clusters);
         ServiceInfo result = serviceInfoHolder.getServiceInfoMap().get(serviceKey);
         if (null == result) {

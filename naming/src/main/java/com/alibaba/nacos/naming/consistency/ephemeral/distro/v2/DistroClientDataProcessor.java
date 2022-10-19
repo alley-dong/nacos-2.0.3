@@ -114,7 +114,8 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
         // Verify failed data should be sync directly.
         distroProtocol.syncToTarget(distroKey, DataOperation.ADD, event.getTargetServer(), 0L);
     }
-    
+
+    // 负责节点
     private void syncToAllServer(ClientEvent event) {
         Client client = event.getClient();
         // Only ephemeral data sync by Distro, persist client should sync by raft.
@@ -134,7 +135,8 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
     public String processType() {
         return TYPE;
     }
-    
+
+    //非负责节点
     @Override
     public boolean processData(DistroData distroData) {
         switch (distroData.getType()) {
@@ -142,6 +144,7 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
             case CHANGE:
                 ClientSyncData clientSyncData = ApplicationUtils.getBean(Serializer.class)
                         .deserialize(distroData.getContent(), ClientSyncData.class);
+                //处理同步数据
                 handlerClientSyncData(clientSyncData);
                 return true;
             case DELETE:
@@ -207,7 +210,8 @@ public class DistroClientDataProcessor extends SmartSubscriber implements Distro
         }
         return true;
     }
-    
+
+    // DistroSyncChangeTask
     @Override
     public DistroData getDistroData(DistroKey distroKey) {
         Client client = clientManager.getClient(distroKey.getResourceKey());

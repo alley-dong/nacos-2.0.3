@@ -158,7 +158,8 @@ public class ServiceInfoUpdateService implements Closeable {
             this.groupedServiceName = NamingUtils.getGroupedName(serviceName, groupName);
             this.serviceKey = ServiceInfo.getKey(groupedServiceName, clusters);
         }
-        
+
+        // UpdateTask 执行逻辑
         @Override
         public void run() {
             long delayTime = DEFAULT_DELAY;
@@ -173,6 +174,7 @@ public class ServiceInfoUpdateService implements Closeable {
                 ServiceInfo serviceObj = serviceInfoHolder.getServiceInfoMap().get(serviceKey);
                 if (serviceObj == null) {
                     serviceObj = namingClientProxy.queryInstancesOfService(serviceName, groupName, clusters, 0, false);
+                    // 处理本地缓存  事件机制的处理
                     serviceInfoHolder.processServiceInfo(serviceObj);
                     lastRefTime = serviceObj.getLastRefTime();
                     return;
@@ -180,6 +182,7 @@ public class ServiceInfoUpdateService implements Closeable {
                 
                 if (serviceObj.getLastRefTime() <= lastRefTime) {
                     serviceObj = namingClientProxy.queryInstancesOfService(serviceName, groupName, clusters, 0, false);
+                    // 处理本地缓存
                     serviceInfoHolder.processServiceInfo(serviceObj);
                 }
                 lastRefTime = serviceObj.getLastRefTime();

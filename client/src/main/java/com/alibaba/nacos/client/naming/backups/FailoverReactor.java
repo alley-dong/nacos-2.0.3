@@ -67,7 +67,8 @@ public class FailoverReactor implements Closeable {
     private static final long DAY_PERIOD_MINUTES = 24 * 60;
     
     private final String failoverDir;
-    
+
+    //  FailoverReactor 和  ServiceInfoHolder 互相引用
     private final ServiceInfoHolder serviceInfoHolder;
     
     private final ScheduledExecutorService executorService;
@@ -85,6 +86,7 @@ public class FailoverReactor implements Closeable {
                 return thread;
             }
         });
+        // 其他初始化操作，通过executorService开启多个定时任务执行
         this.init();
     }
     
@@ -92,12 +94,15 @@ public class FailoverReactor implements Closeable {
      * Init.
      */
     public void init() {
-        
+        //  初始化立即执行，执行间隔5秒，执行任务SwitchRefresher
         executorService.scheduleWithFixedDelay(new SwitchRefresher(), 0L, 5000L, TimeUnit.MILLISECONDS);
-        
+
+        // 初始化延迟30分钟执行，执行间隔24小时，执行任务DiskFileWriter
         executorService.scheduleWithFixedDelay(new DiskFileWriter(), 30, DAY_PERIOD_MINUTES, TimeUnit.MINUTES);
         
         // backup file on startup if failover directory is empty.
+        // 如果故障目录为空，启动时立即执行，立即备份文件
+        // 初始化立即执行，执行间隔10秒，执行核心操作为DiskFileWriter
         executorService.schedule(new Runnable() {
             @Override
             public void run() {

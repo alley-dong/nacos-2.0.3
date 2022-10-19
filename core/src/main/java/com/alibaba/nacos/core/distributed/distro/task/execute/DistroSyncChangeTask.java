@@ -40,7 +40,8 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
     protected DataOperation getDataOperation() {
         return OPERATION;
     }
-    
+
+    // 无回调
     @Override
     protected boolean doExecute() {
         String type = getDistroKey().getResourceType();
@@ -49,10 +50,10 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
             Loggers.DISTRO.warn("[DISTRO] {} with null data to sync, skip", toString());
             return true;
         }
-        return getDistroComponentHolder().findTransportAgent(type)
-                .syncData(distroData, getDistroKey().getTargetServer());
+        return getDistroComponentHolder().findTransportAgent(type).syncData(distroData, getDistroKey().getTargetServer());
     }
-    
+
+    // 有回调
     @Override
     protected void doExecuteWithCallback(DistroCallback callback) {
         String type = getDistroKey().getResourceType();
@@ -61,15 +62,15 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
             Loggers.DISTRO.warn("[DISTRO] {} with null data to sync, skip", toString());
             return;
         }
-        getDistroComponentHolder().findTransportAgent(type)
-                .syncData(distroData, getDistroKey().getTargetServer(), callback);
+        getDistroComponentHolder().findTransportAgent(type).syncData(distroData, getDistroKey().getTargetServer(), callback);
     }
     
     @Override
     public String toString() {
         return "DistroSyncChangeTask for " + getDistroKey().toString();
     }
-    
+
+    // 从DistroClientDataProcessor获取DistroData
     private DistroData getDistroData(String type) {
         DistroData result = getDistroComponentHolder().findDataStorage(type).getDistroData(getDistroKey());
         if (null != result) {
